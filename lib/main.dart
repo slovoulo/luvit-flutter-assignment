@@ -55,6 +55,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    precacheImage(const AssetImage("assets/icons/eclipse.png"), context);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,

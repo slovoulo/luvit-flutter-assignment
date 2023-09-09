@@ -48,7 +48,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   List<Widget> _buildScreens() {
     return [
-      const HomePage(),
+       HomePage(),
       const LocationScreen(),
        Container(),
       const ChatScreen(),
@@ -96,7 +96,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           routeAndNavigatorSettings: RouteAndNavigatorSettings(
             initialRoute: '/',
             routes: {
-              '/first': (context) => const HomePage(),
+              '/first': (context) =>  HomePage(),
               '/second': (context) => const LocationScreen(),
               '/third': (context) => const ChatScreen(),
               //'/fourth': (context) => const ProfileScreen(),
