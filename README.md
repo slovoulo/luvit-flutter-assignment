@@ -1,16 +1,5 @@
 # interviews
 
-A new Flutter project.
+This is a solution for an interview that requires creating a User interface for a dating app that fetches data from Firebase realtime database.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+To test the app. Install flutter in your developmemnt environment, then run the following command "flutter run"
