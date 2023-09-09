@@ -1,12 +1,11 @@
 
-import 'dart:io';
+
 
 import 'package:flutter/material.dart';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:interviews/screens/home_page.dart';
 import 'package:interviews/screens/navigation.dart';
-import 'package:provider/provider.dart';
+
 import 'firebase_options.dart';
 
 

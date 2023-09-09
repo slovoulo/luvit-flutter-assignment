@@ -76,8 +76,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           activeColorPrimary: kPrimaryIcon,
           inactiveColorPrimary: Colors.grey,
         ),PersistentBottomNavBarItem(
-          icon: const Icon(Icons.add, color: Colors.white),
-          activeColorPrimary: Colors.deepPurple,
+          icon: const Icon(Icons.star, color: Colors.black),
+          activeColorPrimary: Colors.grey,
           inactiveColorPrimary: Colors.grey,
         ),
         PersistentBottomNavBarItem(
@@ -109,8 +109,10 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     }
 
     return PersistentTabView(
+
       context,
       controller: controller,
+      backgroundColor: Colors.black26,
       screens: _buildScreens(),
       items: _navBarsItems(),
       confineInSafeArea: true,

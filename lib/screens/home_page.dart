@@ -1,11 +1,9 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:interviews/data/fruit_data.dart';
 import '../contstants.dart';
-import '../data/data_service.dart';
-import 'dart:developer';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,100 +14,58 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final DatabaseReference databaseReference =
-      FirebaseDatabase.instance.reference();
+      FirebaseDatabase.instance.ref();
 
-  List imageUrls = [];
-  List age = [];
-  List description = [];
-  List likeCount = [];
-  List location = [];
-  List tags = [];
-  List names = [];
+  String? userLocation;
+  String? likeCount;
   int currentIndex = 0;
+  Map? fruitsData;
 
-  // Future<List> getFruits() async {
-  //   final List fruits = [];
-  //   final needsSnapshot =
-  //       await FirebaseDatabase.instance.reference().child("data").get();
-  //
-  //   print(needsSnapshot); // to debug and see if data is returned
-  //
-  //   final map = needsSnapshot.value as Map<dynamic, dynamic>;
-  //
-  //   map.forEach((key, value) {
-  //     final fruit = Fruit.fromMap(value);
-  //
-  //     imageUrls.add(fruit.images);
-  //     age.add(fruit.age);
-  //     description.add(fruit.description);
-  //     likeCount.add(fruit.likeCount);
-  //     location.add(fruit.location);
-  //     tags.add(fruit.tags);
-  //     location.add(fruit.location);
-  //     names.add(fruit.name);
-  //   });
-  //  // print("Retuned objects ${needsSnapshot.value}");
-  //   print("Retuned objects ${map.data[0]}");
-  //   //print("Map data is ${fruits.}");
-  //
-  //   return fruits!;
-  // }
 
-  Future getFruits() async {
-    FirebaseDatabase database = FirebaseDatabase.instance;
-
-    // Get a reference to the data you want to listen to.
-    DatabaseReference ref = database.ref('data');
-
-    // Listen for real-time updates to the data.
-    ref.onValue.listen((DatabaseEvent event) {
-      // Do something with the data.
-      Map? data = event.snapshot.value as Map?;
-      data?.forEach((fruitName, fruitDetails) {
-        // loop through the outer map
-        print("Fruit name is: $fruitName");
-
-        Map details = fruitDetails; // inner map
-        print("Description: ${details['description']}");
-        print("Like count: ${details['likeCount']}");
-        print("Location: ${details['location']}");
-        print("Age: ${details['age']}");
-
-        List images = details['images']; // get images as list
-        for (int i = 0; i < images.length; i++) {
-          print("Image $i: ${images[i]}");
-        }
-
-        List tags = details['tags']; // get tags as list
-        for (int i = 0; i < tags.length; i++) {
-          print("Tag $i: ${tags[i]}");
-        }
-      });
-    });
-  }
 
   Widget buildCarousel(Map data) {
     return CarouselSlider(
+
       options: CarouselOptions(
           viewportFraction: 0.9,
           height: MediaQuery.of(context).size.height * 0.75,
 
           //  height: 400,
           enlargeCenterPage: false,
+          //Use the onChanged property to update appbar
+          onPageChanged: (index,r){
+            setState(() {
+              currentIndex=index;
+              _updateCurrentLocation();
+            });
+          },
           enableInfiniteScroll: false),
+
+
       items: data.entries.map<Widget>((entry) {
-        String fruitName = entry.key;
+
         Map fruitDetails = entry.value;
-        List images = fruitDetails['images'];
+
 
         return Builder(builder: (BuildContext context) {
           return ImageStackCard(fruitDetails);
         });
       }).toList(),
+
     );
   }
 
-  Map? fruitsData;
+  void _updateCurrentLocation() {
+    if (fruitsData != null) {
+      String fruitName = fruitsData!.keys.elementAt(currentIndex);
+      Map fruitDetails = fruitsData![fruitName];
+      userLocation = fruitDetails['location'] ;
+      likeCount=fruitDetails["likeCount"].toString() ;
+
+    }
+  }
+
+
   @override
   void initState() {
     // TODO: implement initState
@@ -120,6 +76,7 @@ class _HomePageState extends State<HomePage> {
     ref.onValue.listen((DatabaseEvent event) {
       setState(() {
         fruitsData = event.snapshot.value as Map;
+        _updateCurrentLocation();
       });
     });
   }
@@ -129,201 +86,24 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: luvitAppbar(
         context: context,
-        likeCount: '35',
-        location: 'Seoul',
+        likeCount: likeCount ?? "wait",
+        location: userLocation ?? "Location",
       ),
       body: fruitsData != null
           ? buildCarousel(fruitsData!)
-          : Center(
+          : const Center(
               child: CircularProgressIndicator(),
             ),
     );
 
-    // return Scaffold(
-    //   appBar: luvitAppbar(
-    //     context: context,
-    //     likeCount: '35',
-    //     location: 'Seoul',
-    //   ),
-    //   body: GestureDetector(
-    //     onTapUp: (TapUpDetails details) {
-    //       // Get the RenderBox for the widget, and then translate the global
-    //       // position into local coordinates.
-    //       final RenderBox box = context.findRenderObject() as RenderBox;
-    //       final Offset localPosition =
-    //           box.globalToLocal(details.globalPosition);
-    //       final double halfWidth = box.size.width / 2;
-    //
-    //       // Check the position and update the state accordingly
-    //       if (localPosition.dx < halfWidth) {
-    //         // Left half tapped
-    //         setState(() {
-    //           if (currentIndex > 0) {
-    //             currentIndex--;
-    //           }
-    //         });
-    //       } else {
-    //         // Right half tapped
-    //         setState(() {
-    //           if (currentIndex < imageUrls.length - 1) {
-    //             currentIndex++;
-    //           }
-    //         });
-    //       }
-    //     },
-    //     child: Card(
-    //       elevation: 5,
-    //       shape: RoundedRectangleBorder(
-    //         borderRadius: BorderRadius.circular(30.0),
-    //       ),
-    //       child: Container(
-    //         decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-    //         width: MediaQuery.of(context).size.width,
-    //         height: MediaQuery.of(context).size.height * 0.75,
-    //         child: ClipRRect(
-    //           borderRadius: BorderRadius.circular(15.0),
-    //           child: Stack(
-    //             alignment: Alignment.bottomLeft,
-    //             children: [
-    //               Stack(
-    //                 fit: StackFit.expand,
-    //                 children: [
-    //                   for (var i = 0; i < imageUrls.length; i++)
-    //                     Visibility(
-    //                       visible: currentIndex == i,
-    //                       child: Image.network(
-    //                         imageUrls[0][i],
-    //                         fit: BoxFit.cover,
-    //                       ),
-    //                     ),
-    //                   Positioned(
-    //                     top: 10,
-    //                     left: 0,
-    //                     right: 0,
-    //                     child: Row(
-    //                       mainAxisAlignment: MainAxisAlignment.center,
-    //                       children: [
-    //                         for (var i = 0; i < imageUrls.length; i++)
-    //                           Container(
-    //                            margin: EdgeInsets.symmetric(horizontal: 2.0),
-    //                             width: 65,
-    //                             height: 5,
-    //                             decoration: BoxDecoration(
-    //                               borderRadius: BorderRadius.circular(5),
-    //                              // shape: BoxShape.rectangle,
-    //                               color: currentIndex == i ? kPrimaryIcon : Colors.grey,
-    //                             ),
-    //                           ),
-    //                       ],
-    //                     ),)
-    //                 ],
-    //               ),
-    //               Container(color: Colors.black.withOpacity(0.1),
-    //                 //width: MediaQuery.of(context).size.width * 0.6,
-    //
-    //                 child: Padding(
-    //                   padding: const EdgeInsets.only(left: 25.0,right: 25),
-    //                   child: Column(
-    //                     mainAxisAlignment: MainAxisAlignment.end,
-    //                     crossAxisAlignment: CrossAxisAlignment.start,
-    //                     children: [
-    //                       Container(
-    //                           height: 55,
-    //
-    //                           child: Row(
-    //                             crossAxisAlignment: CrossAxisAlignment.end,
-    //                             children: [
-    //                               for (var i = 0; i < names.length; i++)
-    //                               Flexible(
-    //                                 child: FittedBox(fit: BoxFit.fitWidth,
-    //                                   child:
-    //
-    //                                   Text(
-    //
-    //                                     names[i],
-    //
-    //                                     style: const TextStyle(
-    //                                       color: kTextColor,
-    //                                         fontSize: 55,
-    //                                         fontWeight: FontWeight.bold),
-    //                                   ),
-    //                                 ),
-    //                               ),
-    //                               horizontalSpace(5),
-    //                               for (var i = 0; i < age.length; i++)
-    //                               Text(age[i].toString(),
-    //                                   style: TextStyle(fontSize: 30,color: kTextColor))
-    //                             ],
-    //                           )),
-    //                       Flexible(
-    //                         child: SizedBox(width: MediaQuery.of(context).size.width*0.5,
-    //                           child: Text(
-    //                             description[0],
-    //                             style: TextStyle(color: kTextColor.withOpacity(0.8)),
-    //                           ),
-    //                         ),
-    //                       ),
-    //                       verticalSpace(20),
-    //                       Center(child: Icon(Icons.keyboard_arrow_down),),
-    //                       verticalSpace(20),
-    //                     ],
-    //                   ),
-    //                 ),
-    //               )
-    //             ],
-    //           ),
-    //         ),
-    //       ),
-    //     ),
-    //   ),
-    //
-    //
-    // );
+
   }
 }
 
-// class HomePage extends StatelessWidget {
-//   final List<Map<String, dynamic>> sampleList = [
-//     {
-//       'imageUrls': [
-//         'https://placekitten.com/200/300',
-//         'https://placekitten.com/201/300',
-//         'https://placekitten.com/202/300',
-//       ],
-//       'name': 'Kitty 1',
-//     },
-//     {
-//       'imageUrls': [
-//         'https://placekitten.com/203/300',
-//         'https://placekitten.com/204/300',
-//       ],
-//       'name': 'Kitty 2',
-//     },
-//     // Add more entries here
-//   ];
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return CarouselSlider(
-//       options: CarouselOptions(
-//         height: 400,
-//         autoPlay: false,
-//       ),
-//       items: sampleList.map((item) {
-//         return Builder(
-//           builder: (BuildContext context) {
-//             return ImageStackCard(item);
-//           },
-//         );
-//       }).toList(),
-//     );
-//   }
-// }
-//
-//
+
 class ImageStackCard extends StatefulWidget {
   final Map<dynamic, dynamic> data;
-  ImageStackCard(this.data);
+  const ImageStackCard(this.data, {super.key});
 
   @override
   _ImageStackCardState createState() => _ImageStackCardState();
@@ -332,12 +112,15 @@ class ImageStackCard extends StatefulWidget {
 class _ImageStackCardState extends State<ImageStackCard> {
   int currentIndex = 0;
 
+
+
   @override
   Widget build(BuildContext context) {
     var imageUrls = widget.data['images'];
     var name = widget.data['name'];
     var age = widget.data['age'];
     var description = widget.data['description'];
+    bool displayTags=false;
 
     return GestureDetector(
       onTapUp: (TapUpDetails details) {
@@ -392,7 +175,7 @@ class _ImageStackCardState extends State<ImageStackCard> {
                       children: [
                         for (var i = 0; i < imageUrls.length; i++)
                           Container(
-                            margin: EdgeInsets.symmetric(horizontal: 2),
+                            margin: const EdgeInsets.symmetric(horizontal: 2),
                             width: MediaQuery.of(context).size.width * 0.18,
                             height: 5,
                             decoration: BoxDecoration(
@@ -405,26 +188,33 @@ class _ImageStackCardState extends State<ImageStackCard> {
                     )),
                 Container(
                   color: Colors.black.withOpacity(0.17),
-                  padding: EdgeInsets.only(left: 15, right: 15),
+                  padding: const EdgeInsets.only(left: 15, right: 15),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          Text(
-                            name,
-                            style: const TextStyle(
-                              color: kTextColor,
-                              fontSize: 35,
-                              fontWeight: FontWeight.bold,
-                              //backgroundColor: Colors.black.withOpacity(0.1),
+                          SizedBox(width: MediaQuery.of(context).size.width*0.5,
+                            child: AutoSizeText(
+
+                              name,
+                              maxLines: 1,
+                              minFontSize: 12,
+                              style: const TextStyle(
+
+                                color: kTextColor,
+                                fontSize: 35,
+                                fontWeight: FontWeight.bold,
+                                //backgroundColor: Colors.black.withOpacity(0.1),
+                              ),
                             ),
                           ),
+                          horizontalSpace(10),
                           Text(age.toString(),
                               style: const TextStyle(
                                   fontSize: 25, color: kTextColor)),
-                          Spacer(),
+                          const Spacer(),
 
                           Image.asset("assets/icons/eclipse.png")
 
@@ -436,8 +226,12 @@ class _ImageStackCardState extends State<ImageStackCard> {
                         style: TextStyle(color: kTextColor.withOpacity(0.8)),
                       ),
                       verticalSpace(20),
-                      const Center(
-                        child: Icon(Icons.keyboard_arrow_down),
+                       Center(
+                        child: IconButton(onPressed: (){
+                          setState(() {
+                            displayTags=!displayTags;
+                          });
+                        }, icon: const Icon(Icons.keyboard_arrow_down))
                       ),
                       verticalSpace(20),
                     ],
