@@ -117,40 +117,78 @@ class _HomePageState extends State<HomePage> {
                             fit: BoxFit.cover,
                           ),
                         ),
+                      Positioned(
+                        top: 10,
+                        left: 0,
+                        right: 0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            for (var i = 0; i < imageUrls.length; i++)
+                              Container(
+                               margin: EdgeInsets.symmetric(horizontal: 2.0),
+                                width: 65,
+                                height: 5,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                 // shape: BoxShape.rectangle,
+                                  color: currentIndex == i ? kPrimaryIcon : Colors.grey,
+                                ),
+                              ),
+                          ],
+                        ),)
                     ],
                   ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.6,
+                  Container(color: Colors.black.withOpacity(0.1),
+                    //width: MediaQuery.of(context).size.width * 0.6,
 
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                            height: 40,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    names[0],
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 25.0,right: 25),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                              height: 55,
 
-                                    style: const TextStyle(
-                                        fontSize: 40,
-                                        fontWeight: FontWeight.bold),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  for (var i = 0; i < names.length; i++)
+                                  Flexible(
+                                    child: FittedBox(fit: BoxFit.fitWidth,
+                                      child:
+
+                                      Text(
+
+                                        names[i],
+
+                                        style: const TextStyle(
+                                          color: kTextColor,
+                                            fontSize: 55,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                verticalSpace(5),
-                                Text(age[0].toString(),
-                                    style: TextStyle(fontSize: 20))
-                              ],
-                            )),
-                        Flexible(
-                          child: Text(
-                            description[0],
+                                  horizontalSpace(5),
+                                  for (var i = 0; i < age.length; i++)
+                                  Text(age[i].toString(),
+                                      style: TextStyle(fontSize: 30,color: kTextColor))
+                                ],
+                              )),
+                          Flexible(
+                            child: SizedBox(width: MediaQuery.of(context).size.width*0.5,
+                              child: Text(
+                                description[0],
+                                style: TextStyle(color: kTextColor.withOpacity(0.8)),
+                              ),
+                            ),
                           ),
-                        )
-                      ],
+                          verticalSpace(20),
+                          Center(child: Icon(Icons.keyboard_arrow_down),),
+                          verticalSpace(20),
+                        ],
+                      ),
                     ),
                   )
                 ],

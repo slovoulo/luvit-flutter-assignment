@@ -5,6 +5,7 @@ const kPrimaryIcon= Color(0xFFff016b);
 const kBackgroundColor = Color(0xFF0e0d0d);
 const kContainerBackGround = Color(0xFF000000);
 const kTextColor = Color(0xFFfcfcfc);
+const kTextColorLighter = Color(0xFFb1b1b0);
 const kBellRed = Color(0xFFff0000);
 
 //Vertical SizeBox
@@ -23,7 +24,7 @@ horizontalSpace(double width) {
 
 luvitAppbar(
     {required BuildContext context, required String likeCount, required String location, }){
-  return AppBar(centerTitle: true, automaticallyImplyLeading: false,
+  return AppBar(backgroundColor:Colors.transparent,elevation:0.0,centerTitle: true, automaticallyImplyLeading: false,
 
 
     title:  Row(
